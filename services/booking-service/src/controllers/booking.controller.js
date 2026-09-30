@@ -137,8 +137,18 @@ const handlePaymentSuccess = async (data) => {
 
   await booking.save();
 
+  await publishMessage("booking_confirmed", {
+    bookingId: booking._id.toString(),
+    seatIds: booking.seatIds,
+    userId: booking.userId
+  });
+
   console.log(
     `Booking ${booking._id} confirmed`
+  );
+
+  console.log(
+    "booking_confirmed event published"
   );
 };
 
@@ -156,8 +166,18 @@ const handlePaymentFailure = async (data) => {
 
   await booking.save();
 
+  await publishMessage("booking_cancelled", {
+    bookingId: booking._id.toString(),
+    seatIds: booking.seatIds,
+    userId: booking.userId
+  });
+
   console.log(
     `Payment failed for booking ${booking._id}`
+  );
+
+  console.log(
+    "booking_cancelled event published"
   );
 };
 
