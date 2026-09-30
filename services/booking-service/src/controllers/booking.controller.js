@@ -137,11 +137,17 @@ const handlePaymentSuccess = async (data) => {
 
   await booking.save();
 
-  await publishMessage("booking_confirmed", {
-    bookingId: booking._id.toString(),
-    seatIds: booking.seatIds,
-    userId: booking.userId
-  });
+  await publishMessage("seat_booking_confirmed", {
+  bookingId: booking._id.toString(),
+  seatIds: booking.seatIds,
+  userId: booking.userId
+});
+
+await publishMessage("notification_booking_confirmed", {
+  bookingId: booking._id.toString(),
+  seatIds: booking.seatIds,
+  userId: booking.userId
+});
 
   console.log(
     `Booking ${booking._id} confirmed`
@@ -166,11 +172,17 @@ const handlePaymentFailure = async (data) => {
 
   await booking.save();
 
-  await publishMessage("booking_cancelled", {
-    bookingId: booking._id.toString(),
-    seatIds: booking.seatIds,
-    userId: booking.userId
-  });
+  await publishMessage("seat_booking_cancelled", {
+  bookingId: booking._id.toString(),
+  seatIds: booking.seatIds,
+  userId: booking.userId
+});
+
+await publishMessage("notification_booking_cancelled", {
+  bookingId: booking._id.toString(),
+  seatIds: booking.seatIds,
+  userId: booking.userId
+});
 
   console.log(
     `Payment failed for booking ${booking._id}`

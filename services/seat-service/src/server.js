@@ -25,12 +25,12 @@ const startServer = async () => {
     await connectRabbitMQ();
 
     await consumeMessages(
-      "booking_confirmed",
+      "seat_booking_confirmed",
       confirmSeats
     );
 
     await consumeMessages(
-      "booking_cancelled",
+      "seat_booking_cancelled",
       releaseSeats
     );
 

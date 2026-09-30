@@ -10,13 +10,13 @@ const connectRabbitMQ = async () => {
 
     channel = await connection.createChannel();
 
-    await channel.assertQueue("booking_confirmed", {
-      durable: true
-    });
+    await channel.assertQueue("seat_booking_confirmed", {
+  durable: true
+});
 
-    await channel.assertQueue("booking_cancelled", {
-      durable: true
-    });
+await channel.assertQueue("seat_booking_cancelled", {
+  durable: true
+});
 
     console.log("RabbitMQ connected");
   } catch (error) {

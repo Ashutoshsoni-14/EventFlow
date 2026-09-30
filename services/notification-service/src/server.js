@@ -19,14 +19,14 @@ const startServer = async () => {
     await connectRabbitMQ();
 
     await consumeMessages(
-      "booking_confirmed",
-      sendBookingConfirmation
-    );
+  "notification_booking_confirmed",
+  sendBookingConfirmation
+);
 
-    await consumeMessages(
-      "booking_cancelled",
-      sendBookingCancellation
-    );
+await consumeMessages(
+  "notification_booking_cancelled",
+  sendBookingCancellation
+);
 
     app.listen(PORT, () => {
       console.log(
