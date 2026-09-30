@@ -165,9 +165,55 @@ const verifySeats = async (req, res) => {
   }
 };
 
+const confirmSeats = async (data) => {
+  const { seatIds } = data;
+
+  await Seat.updateMany(
+    {
+      _id: { $in: seatIds },
+      status: "LOCKED"
+    },
+    {
+      $set: {
+        status: "BOOKED",
+        lockedBy: null,
+        lockedUntil: null
+      }
+    }
+  );
+
+  console.log(
+    `Seats booked: ${seatIds.join(", ")}`
+  );
+};
+
+const releaseSeats = async (data) => {
+  const { seatIds } = data;
+
+  await Seat.updateMany(
+    {
+      _id: { $in: seatIds },
+      status: "LOCKED"
+    },
+    {
+      $set: {
+        status: "AVAILABLE",
+        lockedBy: null,
+        lockedUntil: null
+      }
+    }
+  );
+
+  console.log(
+    `Seats released: ${seatIds.join(", ")}`
+  );
+};
+
 module.exports = {
   createSeats,
   getSeatsByEvent,
   lockSeat,
-  verifySeats
+  verifySeats,
+  confirmSeats,
+  releaseSeats
 };
