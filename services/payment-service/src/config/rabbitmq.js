@@ -2,34 +2,23 @@ const amqp = require("amqplib");
 
 let channel;
 
-const connectRabbitMQ = async () => {
-  try {
-    const connection = await amqp.connect(
-      process.env.RABBITMQ_URL
-    );
+const connectRabbitMQ = async (maxRetries = 10, delay = 3000) => {
+  for (let i = 1; i <= maxRetries; i++) {
+    try {
+      const connection = await amqp.connect(process.env.RABBITMQ_URL);
+      channel = await connection.createChannel();
 
-    channel = await connection.createChannel();
+      await channel.assertQueue("booking_created", { durable: true });
+      await channel.assertQueue("payment_successful", { durable: true });
+      await channel.assertQueue("payment_failed", { durable: true });
 
-    await channel.assertQueue("booking_created", {
-      durable: true
-    });
-
-    await channel.assertQueue("payment_successful", {
-      durable: true
-    });
-
-    await channel.assertQueue("payment_failed", {
-      durable: true
-    });
-
-    console.log("RabbitMQ connected");
-  } catch (error) {
-    console.error(
-      "RabbitMQ connection failed:",
-      error.message
-    );
-
-    throw error;
+      console.log("RabbitMQ connected successfully in Payment Service");
+      return;
+    } catch (error) {
+      console.error(`RabbitMQ connection attempt ${i}/${maxRetries} failed:`, error.message);
+      if (i === maxRetries) throw error;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
   }
 };
 

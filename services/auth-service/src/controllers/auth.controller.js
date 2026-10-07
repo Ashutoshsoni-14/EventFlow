@@ -29,7 +29,8 @@ const register = async (req, res) => {
     const user = await User.create({
       name,
       email,
-      password: hashedPassword
+      password: hashedPassword,
+      role: req.body.role || "USER"
     });
 
     // 5. Send response

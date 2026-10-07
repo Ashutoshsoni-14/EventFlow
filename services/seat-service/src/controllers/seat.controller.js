@@ -74,7 +74,7 @@ const lockSeat = async (req, res) => {
       });
     }
 
-    if (seat.status === "LOCKED") {
+    if (seat.status === "LOCKED" && seat.lockedUntil && seat.lockedUntil > new Date()) {
       return res.status(409).json({
         message: "Seat is currently locked"
       });
@@ -170,8 +170,7 @@ const confirmSeats = async (data) => {
 
   await Seat.updateMany(
     {
-      _id: { $in: seatIds },
-      status: "LOCKED"
+      _id: { $in: seatIds }
     },
     {
       $set: {
@@ -181,6 +180,14 @@ const confirmSeats = async (data) => {
       }
     }
   );
+
+  for (const id of seatIds) {
+    try {
+      await redisClient.del(`seat-lock:${id}`);
+    } catch (e) {
+      console.error(`Failed to delete redis lock seat-lock:${id}`, e);
+    }
+  }
 
   console.log(
     `Seats booked: ${seatIds.join(", ")}`
@@ -192,8 +199,7 @@ const releaseSeats = async (data) => {
 
   await Seat.updateMany(
     {
-      _id: { $in: seatIds },
-      status: "LOCKED"
+      _id: { $in: seatIds }
     },
     {
       $set: {
@@ -203,6 +209,14 @@ const releaseSeats = async (data) => {
       }
     }
   );
+
+  for (const id of seatIds) {
+    try {
+      await redisClient.del(`seat-lock:${id}`);
+    } catch (e) {
+      console.error(`Failed to delete redis lock seat-lock:${id}`, e);
+    }
+  }
 
   console.log(
     `Seats released: ${seatIds.join(", ")}`
